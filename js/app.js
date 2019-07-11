@@ -21,7 +21,7 @@ class Word {
 
 		if (this.wasGuessed(guess)) {
 			console.log("You already guessed that letter!");
-			return;
+			return true;
 		} else {
 			this.guessedLetters.push(guess);
 
@@ -66,9 +66,33 @@ const game = {
 	// render methods: 
 	displayWord(){
 
+		// remove previous wordDiv if it exists 
+		if (document.getElementById("word")){
+			display.removeChild(document.getElementById("word"));
+		}
+
+		// make new wordDiv: 
+		const wordDiv = document.createElement("div");
+		wordDiv.id = "word";
+
+		this.word.letters.forEach(ltr => {
+			
+			let text = "_";
+
+			if (ltr.display){
+				text = ltr.character.toUpperCase();
+			}
+
+			const letterDiv = document.createElement("div");
+			letterDiv.classList.add("letter");
+			letterDiv.textContent = text; 
+			wordDiv.appendChild(letterDiv);
+		})
+
+		display.appendChild(wordDiv);
 	}, 
 	displayGuesses(){
-
+		guesses.textContent = this.lives;
 	},
 	updateKeyboard(){
 
@@ -105,9 +129,11 @@ const game = {
 
 		for (let i = 0; i < allKeys.length; i++){
 			allKeys[i].addEventListener("click", (evt)=>{
-				
-				console.log(evt.currentTarget.id)
-				// this.word.handleGuess(evt.currentTarget.id);
+				const isGuessCorrect = this.word.handleGuess(evt.currentTarget.id);
+				if (!isGuessCorrect){
+					this.lives--;
+				}
+				this.render();
 			})
 		}
 
@@ -119,15 +145,22 @@ const game = {
 	}
 }
 
+// cached elements 
+const display = document.getElementById("display");
+const guesses = document.getElementById("guesses");
 
+// global functions 
 function activate () {
 	document.body.addEventListener("keypress", (evt) => {
 
 		const input = evt.key.toLowerCase();
 
 		if(validKeys.includes(input)){
-			// this.word.handleGuess(input);
-			console.log(input)	
+			const isGuessCorrect = game.word.handleGuess(input);
+			if (!isGuessCorrect){
+				game.lives--;
+			}
+			game.render();
 		}
 	});
 
