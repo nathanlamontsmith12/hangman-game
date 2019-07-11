@@ -1,6 +1,6 @@
 console.log("all linked up")
 
-const validKeys = "abcdefghijklmnopqrstuvwxyz".split("");
+const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
 
 class Word {
 	constructor(word){
@@ -59,7 +59,9 @@ const game = {
 	round: 1,
 	active: false,
 	getWord(){
-
+		const randInd = Math.floor(Math.random() * wordbank.length);
+		const randWord = wordbank.splice(randInd, 1)[0];
+		this.word = new Word(randWord);
 	},
 	// render methods: 
 	displayWord(){
@@ -76,15 +78,41 @@ const game = {
 		this.displayGuesses();
 		this.updateKeyboard(); 
 	},
+	makeKeyboard(){
+
+		const firstRow = "qwertyuiop".split("");
+		const secondRow = "asdfghjkl".split("");
+		const thirdRow = "zxcvbnm".split("");
+
+		const rows = [firstRow, secondRow, thirdRow];
+
+		for (let i = 0; i <= 2; i++){
+			const rowDiv = document.getElementById(`${i + 1}`);
+
+			rows[i].forEach(key => {
+
+				const keyDiv = document.createElement("div");
+				keyDiv.classList.add("key");
+				keyDiv.id = key;
+				keyDiv.textContent = key.toUpperCase();
+				rowDiv.appendChild(keyDiv);
+
+			})
+
+		}
+
+		const allKeys = document.querySelectorAll(".key");
+
+		for (let i = 0; i < allKeys.length; i++){
+			allKeys[i].addEventListener("click", (evt)=>{
+				
+				console.log(evt.currentTarget.id)
+				// this.word.handleGuess(evt.currentTarget.id);
+			})
+		}
+
+	},
 	init(){
-		document.body.addEventListener("keypress", (evt) => {
-
-			const input = evt.key.toLowerCase();
-
-			if(validKeys.includes(input)){
-				this.word.handleGuess(input);	
-			}
-		});
 		this.makeKeyboard();
 		this.getWord();
 		this.render();
@@ -92,21 +120,18 @@ const game = {
 }
 
 
-/*
-Game methods: 
+function activate () {
+	document.body.addEventListener("keypress", (evt) => {
 
-1. get a new word at random (splice out of wordbank)
-2. init() -- initialize 
-   - set lives (later) 
-   - remove start screen (later)
-   - render game area (later)
+		const input = evt.key.toLowerCase();
 
-   - print keyboard interface 
-   - apply keypress event listener to body 
-   - invoke getWord() 
-   - invoke render() 
-3. render() -- update display 
-	- display word 
-	- display guesses remaining 
-	- update keyboard interface 
-*/
+		if(validKeys.includes(input)){
+			// this.word.handleGuess(input);
+			console.log(input)	
+		}
+	});
+
+	game.init();
+}
+
+activate();
