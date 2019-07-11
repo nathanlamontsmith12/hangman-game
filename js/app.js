@@ -1,5 +1,7 @@
 console.log("all linked up")
 
+const validKeys = "abcdefghijklmnopqrstuvwxyz".split("");
+
 class Word {
 	constructor(word){
 		this.word = word;
@@ -18,7 +20,7 @@ class Word {
 	handleGuess(guess){
 
 		if (this.wasGuessed(guess)) {
-			console.log("You already guessed that!");
+			console.log("You already guessed that letter!");
 			return;
 		} else {
 			this.guessedLetters.push(guess);
@@ -52,8 +54,59 @@ class Word {
 }
 
 const game = {
+	word: null,
+	lives: 5,
+	round: 1,
+	active: false,
+	getWord(){
 
+	},
+	// render methods: 
+	displayWord(){
 
+	}, 
+	displayGuesses(){
+
+	},
+	updateKeyboard(){
+
+	},
+	render(){
+		this.displayWord();
+		this.displayGuesses();
+		this.updateKeyboard(); 
+	},
+	init(){
+		document.body.addEventListener("keypress", (evt) => {
+
+			const input = evt.key.toLowerCase();
+
+			if(validKeys.includes(input)){
+				this.word.handleGuess(input);	
+			}
+		});
+		this.makeKeyboard();
+		this.getWord();
+		this.render();
+	}
 }
 
 
+/*
+Game methods: 
+
+1. get a new word at random (splice out of wordbank)
+2. init() -- initialize 
+   - set lives (later) 
+   - remove start screen (later)
+   - render game area (later)
+
+   - print keyboard interface 
+   - apply keypress event listener to body 
+   - invoke getWord() 
+   - invoke render() 
+3. render() -- update display 
+	- display word 
+	- display guesses remaining 
+	- update keyboard interface 
+*/
