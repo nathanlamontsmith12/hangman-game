@@ -54,7 +54,6 @@ const game = {
 	lives: 5,
 	round: 1,
 	active: false,
-	rendering: false,
 	checkWin(){
 		if (this.lives <= 0){
 			alert(`You lost! The word was ${this.word.word}!!`);
@@ -64,15 +63,14 @@ const game = {
 	},
 	handleInput(input){
 		if(validKeys.includes(input)){
+
 			const isGuessCorrect = this.word.handleGuess(input);
+
 			if (!isGuessCorrect){
 				this.lives--;
 			}
-			this.render();
 
-			while (this.rendering){
-				this.checkWin();
-			}
+			this.render();
 		}
 	},
 	// render methods: 
