@@ -15,8 +15,6 @@ class Word {
 		this.revealed = 0;
 		this.guessedLetters = [];
 	}
-	// methods: 
-	// 1. check if an input character is in the word -- if yes, update revealed and display properties accordingly. Return t/f
 	handleGuess(guess){
 
 		if (this.wasGuessed(guess)) {
@@ -39,11 +37,9 @@ class Word {
 			return goodGuess;			
 		}
 	}
-	// 2. check if all letters have been correctly guessed revealed (just return t/f)
 	isSolved(){
 		return this.revealed === this.length; 
 	}
-	// 3. check if an input character has been guessed already (just return t/f)
 	wasGuessed(character){
 		if (this.guessedLetters.includes(character)) {
 			return true;
@@ -58,10 +54,26 @@ const game = {
 	lives: 5,
 	round: 1,
 	active: false,
-	getWord(){
-		const randInd = Math.floor(Math.random() * wordbank.length);
-		const randWord = wordbank.splice(randInd, 1)[0];
-		this.word = new Word(randWord);
+	rendering: false,
+	checkWin(){
+		if (this.lives <= 0){
+			alert(`You lost! The word was ${this.word.word}!!`);
+		} else if(this.word.isSolved()){
+			alert("You won!");
+		}
+	},
+	handleInput(input){
+		if(validKeys.includes(input)){
+			const isGuessCorrect = this.word.handleGuess(input);
+			if (!isGuessCorrect){
+				this.lives--;
+			}
+			this.render();
+
+			while (this.rendering){
+				this.checkWin();
+			}
+		}
 	},
 	// render methods: 
 	displayWord(){
@@ -102,12 +114,17 @@ const game = {
 		this.displayGuesses();
 		this.updateKeyboard(); 
 	},
+	// init methods: 
+	getWord(){
+		const randInd = Math.floor(Math.random() * wordbank.length);
+		const randWord = wordbank.splice(randInd, 1)[0];
+		this.word = new Word(randWord);
+	},
 	makeKeyboard(){
 
 		const firstRow = "qwertyuiop".split("");
 		const secondRow = "asdfghjkl".split("");
 		const thirdRow = "zxcvbnm".split("");
-
 		const rows = [firstRow, secondRow, thirdRow];
 
 		for (let i = 0; i <= 2; i++){
@@ -124,22 +141,24 @@ const game = {
 			})
 
 		}
-
+	},
+	activateKeyboard(){
 		const allKeys = document.querySelectorAll(".key");
 
 		for (let i = 0; i < allKeys.length; i++){
 			allKeys[i].addEventListener("click", (evt)=>{
-				const isGuessCorrect = this.word.handleGuess(evt.currentTarget.id);
-				if (!isGuessCorrect){
-					this.lives--;
-				}
-				this.render();
+				const input = evt.currentTarget.id; 
+				this.handleInput(input);
 			})
 		}
-
 	},
 	init(){
+		document.body.addEventListener("keypress", (evt) => {
+			const input = evt.key.toLowerCase();
+			this.handleInput(input);
+		});
 		this.makeKeyboard();
+		this.activateKeyboard();
 		this.getWord();
 		this.render();
 	}
@@ -149,22 +168,5 @@ const game = {
 const display = document.getElementById("display");
 const guesses = document.getElementById("guesses");
 
-// global functions 
-function activate () {
-	document.body.addEventListener("keypress", (evt) => {
-
-		const input = evt.key.toLowerCase();
-
-		if(validKeys.includes(input)){
-			const isGuessCorrect = game.word.handleGuess(input);
-			if (!isGuessCorrect){
-				game.lives--;
-			}
-			game.render();
-		}
-	});
-
-	game.init();
-}
-
-activate();
+// wind the gears and let her rip
+game.init();
