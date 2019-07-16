@@ -1,6 +1,8 @@
-console.log("HANGMAN");
 
 const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
+const wordbank = library.filter(word => word.length >= 6);
+
+console.log("HANGMAN");
 
 class Word {
 	constructor(word){
@@ -122,7 +124,7 @@ const game = {
 		display.appendChild(wordDiv);
 	}, 
 	displayGuesses(){
-		guesses.textContent = this.lives;
+		guesses.textContent = `Guesses remaining: ${this.lives}`;
 	},
 	updateKeyboard(){
 		const allKeys = document.querySelectorAll(".key");
