@@ -1,16 +1,4 @@
-console.log("all linked up")
-
-let max = "";
-
-for (let i = 0; i < wordbank.length; i++) {
-	if (wordbank[i].length > max.length) {
-		max = wordbank[i];
-	}
-}
-
-console.log("max")
-console.log(max)
-console.log(max.length)
+console.log("HANGMAN");
 
 const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
 
@@ -65,6 +53,7 @@ class Word {
 
 const game = {
 	word: null,
+	firstGame: true,
 	lives: 5,
 	round: 1,
 	active: false,
@@ -90,19 +79,19 @@ const game = {
 	},
 	gameOver(condition){
 
-		let message = `The word was ${this.word.solution.toUpperCase()}!`
+		gameArea.style.display = "none";
+		messageDisplay.style.display = "flex";
 
-		if (condition === "win") {
-			message = "You won! " + message;
+		const newMessage = `The word was ${this.word.solution.toUpperCase()}!`;
+
+		if (condition === "won") {
+			message.textContent = "You won! " + newMessage;
 		} else {
-			message = "You lost! " + message
+			message.textContent = "You lost! " + newMessage;
 		}
 
-		
-
-	},
-	startGame(){
-		this.init();
+		this.lives = 5;
+		this.round++;
 	},
 	// render methods: 
 	displayWord(){
@@ -141,6 +130,8 @@ const game = {
 		allKeys.forEach(key => {
 			if (this.word.guessedLetters.includes(key.id)) {
 				key.style.opacity = "0.3";
+			} else {
+				key.style.opacity = "1";
 			}
 		})
 	},
@@ -188,12 +179,22 @@ const game = {
 		}
 	},
 	init(){
-		document.body.addEventListener("keypress", (evt) => {
-			const input = evt.key.toLowerCase();
-			this.handleInput(input);
-		});
-		this.makeKeyboard();
-		this.activateKeyboard();
+
+		messageDisplay.style.display = "none";
+		gameArea.style.display = "flex";
+
+		if (this.firstGame) {
+			document.body.addEventListener("keypress", (evt) => {
+				const input = evt.key.toLowerCase();
+				this.handleInput(input);
+			});			
+
+			this.makeKeyboard();
+			this.activateKeyboard();
+
+			this.firstGame = false;
+		}
+
 		this.getWord();
 		this.render();
 	}
@@ -202,4 +203,12 @@ const game = {
 // cached elements 
 const display = document.getElementById("display");
 const guesses = document.getElementById("guesses");
+const message = document.getElementById("message");
+const messageDisplay = document.getElementById("message-display");
+const start = document.getElementById("start");
+const gameArea = document.getElementById("game-area")
 
+// event listeners 
+start.addEventListener("click", ()=>{
+	game.init();
+});

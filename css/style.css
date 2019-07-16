@@ -7,13 +7,25 @@ body {
 	background: lightyellow;
 }
 
-#message {
-	display: none;
-	position: absolute;
+button {
+	width: 40px;
+	height: 40px;
+}
+
+#message-display {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100vh;
+}
+
+#message-display div {
+	text-align: center;
 }
 
 #game-area {
 	display: none;
+	flex-direction: column;
 	margin-top: 40px;
 	margin-left: 40px;
 	max-width: 600px;
