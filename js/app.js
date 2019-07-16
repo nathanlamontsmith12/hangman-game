@@ -4,7 +4,7 @@ const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
 
 class Word {
 	constructor(word){
-		this.word = word;
+		this.solution = word;
 		this.letters = word.split("").map(ltr => {
 			return ({
 				character: ltr,
@@ -16,6 +16,8 @@ class Word {
 		this.guessedLetters = [];
 	}
 	handleGuess(guess){
+
+		// Note: return false(y) to subtract a life/guess 
 
 		if (this.wasGuessed(guess)) {
 			console.log("You already guessed that letter!");
@@ -56,9 +58,9 @@ const game = {
 	active: false,
 	checkWin(){
 		if (this.lives <= 0){
-			alert(`You lost! The word was ${this.word.word}!!`);
+			alert(`You lost! The word was ${this.word.solution}!!`);
 		} else if(this.word.isSolved()){
-			alert("You won!");
+			alert(`You won! You correctly guessed the word ${this.word.solution}!`);
 		}
 	},
 	handleInput(input){
@@ -71,6 +73,7 @@ const game = {
 			}
 
 			this.render();
+			this.checkWin();
 		}
 	},
 	// render methods: 
@@ -105,7 +108,13 @@ const game = {
 		guesses.textContent = this.lives;
 	},
 	updateKeyboard(){
+		const allKeys = document.querySelectorAll(".key");
 
+		allKeys.forEach(key => {
+			if (this.word.guessedLetters.includes(key.id)) {
+				key.style.opacity = "0.3";
+			}
+		})
 	},
 	render(){
 		this.displayWord();
@@ -166,5 +175,6 @@ const game = {
 const display = document.getElementById("display");
 const guesses = document.getElementById("guesses");
 
-// wind the gears and let her rip
+
+
 game.init();
