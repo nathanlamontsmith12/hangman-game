@@ -1,3 +1,92 @@
-body {
-	background: cadetblue;
+* {
+	margin: 0;
+	padding: 0;
 }
+
+body {
+	background: lightyellow;
+}
+
+#message {
+	display: none;
+	position: absolute;
+}
+
+#game-area {
+	display: none;
+	margin-top: 40px;
+	margin-left: 40px;
+	max-width: 600px;
+}
+
+#display {
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+}
+
+#word {
+	align-self: center;
+	display: flex;
+	justify-content: space-between;
+}
+
+#keyboard {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	margin-top: 40px;
+	margin-left: 40px;
+}
+
+.row {
+	display: flex;
+	justify-content: space-around;
+}
+
+.key {
+	border: 1px solid black;
+	height: 40px;
+	width: 40px;
+	margin-bottom: 5px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.key:hover {
+	cursor: pointer;
+}
+
+.letter {
+	min-width: 20px;
+	font-size: 20px;
+}
+
+
+@media only screen and (max-width: 500px) {
+
+	.key {
+		height: 30px;
+		width: 30px;
+	}
+
+}
+
+@media only screen and (max-width: 300px) {
+
+	#keyboard {
+		margin-left: 10px;
+	}
+
+	#game-area {
+		margin-left: 10px;
+	}
+
+	.key {
+		height: 20px;
+		width: 20px;
+	}
+
+}
+

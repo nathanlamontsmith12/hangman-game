@@ -1,5 +1,17 @@
 console.log("all linked up")
 
+let max = "";
+
+for (let i = 0; i < wordbank.length; i++) {
+	if (wordbank[i].length > max.length) {
+		max = wordbank[i];
+	}
+}
+
+console.log("max")
+console.log(max)
+console.log(max.length)
+
 const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
 
 class Word {
@@ -58,9 +70,9 @@ const game = {
 	active: false,
 	checkWin(){
 		if (this.lives <= 0){
-			alert(`You lost! The word was ${this.word.solution}!!`);
+			this.gameOver("lost");
 		} else if(this.word.isSolved()){
-			alert(`You won! You correctly guessed the word ${this.word.solution}!`);
+			this.gameOver("won");
 		}
 	},
 	handleInput(input){
@@ -75,6 +87,22 @@ const game = {
 			this.render();
 			this.checkWin();
 		}
+	},
+	gameOver(condition){
+
+		let message = `The word was ${this.word.solution.toUpperCase()}!`
+
+		if (condition === "win") {
+			message = "You won! " + message;
+		} else {
+			message = "You lost! " + message
+		}
+
+		
+
+	},
+	startGame(){
+		this.init();
 	},
 	// render methods: 
 	displayWord(){
@@ -135,7 +163,7 @@ const game = {
 		const rows = [firstRow, secondRow, thirdRow];
 
 		for (let i = 0; i <= 2; i++){
-			const rowDiv = document.getElementById(`${i + 1}`);
+			const rowDiv = document.getElementById(`r-${i + 1}`);
 
 			rows[i].forEach(key => {
 
@@ -175,6 +203,3 @@ const game = {
 const display = document.getElementById("display");
 const guesses = document.getElementById("guesses");
 
-
-
-game.init();
