@@ -51,13 +51,10 @@ button {
 	margin-left: 40px;
 }
 
-.row {
-	display: flex;
-	justify-content: space-around;
-}
-
 .key {
 	border: 1px solid black;
+	border-top: 2px solid black;
+	border-bottom: 2px solid black;
 	height: 40px;
 	width: 40px;
 	margin-bottom: 5px;
@@ -74,6 +71,20 @@ button {
 	min-width: 20px;
 	font-size: 20px;
 }
+
+.row {
+	display: flex;
+	justify-content: space-around;
+}
+
+.row div:first-child {
+	border-left: 2px solid black;
+}
+
+.row div:last-child {
+	border-right: 2px solid black;
+}
+
 
 
 @media only screen and (max-width: 500px) {
