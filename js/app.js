@@ -1,8 +1,15 @@
 
 const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
+
+// only use words of length >= 6 from word library 
 const wordbank = library.filter(word => word.length >= 6);
 
+
 console.log("HANGMAN");
+
+// +++++++++++++++++++
+// classes 
+// +++++++++++++++++++
 
 class Word {
 	constructor(word){
@@ -45,22 +52,22 @@ class Word {
 		return this.revealed === this.length; 
 	}
 	wasGuessed(character){
-		if (this.guessedLetters.includes(character)) {
-			return true;
-		} else {
-			return false;
-		}
+		return this.guessedLetters.includes(character);
 	}
 }
+
+
+// +++++++++++++++++++
+// game logic
+// +++++++++++++++++++
 
 const game = {
 	word: null,
 	firstGame: true,
-	lives: 5,
+	guesses: 5,
 	round: 1,
-	active: false,
 	checkWin(){
-		if (this.lives <= 0){
+		if (this.guesses <= 0){
 			this.gameOver("lost");
 		} else if(this.word.isSolved()){
 			this.gameOver("won");
@@ -72,7 +79,7 @@ const game = {
 			const isGuessCorrect = this.word.handleGuess(input);
 
 			if (!isGuessCorrect){
-				this.lives--;
+				this.guesses--;
 			}
 
 			this.render();
@@ -88,12 +95,13 @@ const game = {
 
 		if (condition === "won") {
 			message.textContent = "You won! " + newMessage;
+			this.round++;
 		} else {
-			message.textContent = "You lost! " + newMessage;
+			message.textContent = "You lost! " + newMessage + " Starting back at round 1...";
+			this.round = 1;
 		}
 
-		this.lives = 5;
-		this.round++;
+		this.guesses = 5;
 	},
 	// render methods: 
 	displayWord(){
@@ -124,7 +132,10 @@ const game = {
 		display.appendChild(wordDiv);
 	}, 
 	displayGuesses(){
-		guesses.textContent = `Guesses remaining: ${this.lives}`;
+		guesses.textContent = `Guesses Remaining: ${this.guesses}`;
+	},
+	displayRound(){
+		round.textContent = `Round: ${this.round}`;
 	},
 	updateKeyboard(){
 		const allKeys = document.querySelectorAll(".key");
@@ -139,6 +150,7 @@ const game = {
 	},
 	render(){
 		this.displayWord();
+		this.displayRound();
 		this.displayGuesses();
 		this.updateKeyboard(); 
 	},
@@ -202,15 +214,22 @@ const game = {
 	}
 }
 
+// +++++++++++++++++++
 // cached elements 
+// +++++++++++++++++++
+
 const display = document.getElementById("display");
 const guesses = document.getElementById("guesses");
 const message = document.getElementById("message");
 const messageDisplay = document.getElementById("message-display");
 const start = document.getElementById("start");
 const gameArea = document.getElementById("game-area")
+const round = document.getElementById("round");
 
+// +++++++++++++++++++
 // event listeners 
+// +++++++++++++++++++
+
 start.addEventListener("click", ()=>{
 	game.init();
 });
