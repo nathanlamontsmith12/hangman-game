@@ -85,8 +85,6 @@ button {
 	border-right: 2px solid black;
 }
 
-
-
 @media only screen and (max-width: 500px) {
 
 	.key {
@@ -112,4 +110,3 @@ button {
 	}
 
 }
-
