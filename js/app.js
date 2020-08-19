@@ -1,8 +1,8 @@
+console.log(" *** HANGMAN *** ");
+
 // +++++++++++++++++++
 // IIFE wrapper
 // +++++++++++++++++++
-
-console.log(" *** HANGMAN *** ");
 
 void (function() {
 
