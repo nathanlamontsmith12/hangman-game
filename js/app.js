@@ -20,11 +20,9 @@ void (function() {
 			this.letters = word.split("").map(ltr => {
 				return ({
 					character: ltr,
-					display: false
+					guessed: false
 				});
 			});
-			this.length = this.letters.length;
-			this.revealed = 0;
 			this.guessedLetters = [];
 		}
 		handleGuess(guess){
@@ -38,20 +36,19 @@ void (function() {
 
 				let goodGuess = false; 
 
-				for (let i = 0; i < this.length; i++) {
+				for (let i = 0; i < this.letters.length; i++) {
 
 					if (this.letters[i].character == guess) {
-						this.letters[i].display = true;
-						this.revealed++;
+						this.letters[i].guessed = true;
 						goodGuess = true;
 					}
 				}
 
-				return goodGuess;			
+				return goodGuess;
 			}
 		}
 		isSolved(){
-			return this.revealed === this.length; 
+			return this.letters.every(ltr => ltr.guessed == true); 
 		}
 		wasGuessed(character){
 			return this.guessedLetters.includes(character);
@@ -126,7 +123,7 @@ void (function() {
 				
 				let text = "_";
 
-				if (ltr.display){
+				if (ltr.guessed){
 					text = ltr.character.toUpperCase();
 				}
 
