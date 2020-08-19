@@ -1,14 +1,22 @@
 console.log(" *** HANGMAN *** ");
 
+
 // +++++++++++++++++++
 // IIFE wrapper
 // +++++++++++++++++++
 
 void (function() {
 
-	// only use words of length >= 6 from word library 
 
+	// +++++++++++++++++++
+	// constants 
+	// +++++++++++++++++++
+
+	const VALID_KEYS = "qwertyuiopasdfghjklzxcvbnm".split("");
+
+	// only use words of length >= 6 from word library 
 	const WORD_BANK = library.filter(word => word.length >= 6);
+
 
 	// +++++++++++++++++++
 	// classes 
@@ -59,7 +67,6 @@ void (function() {
 	// +++++++++++++++++++++++
 	// classes -- singletons
 	// +++++++++++++++++++++++
-
 
 	// All display updating logic encapsulated here:  
 
@@ -131,7 +138,7 @@ void (function() {
 				letterDiv.classList.add("letter");
 				letterDiv.textContent = text; 
 				wordDiv.appendChild(letterDiv);
-			})
+			});
 
 			this.displayEl.appendChild(wordDiv);
 		}
@@ -222,20 +229,15 @@ void (function() {
 		handleInput(input){
 			if (input === "enter" && !this.active) {
 				this.start();
-			} else {
-				const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
+			} else if (this.active && VALID_KEYS.includes(input)){
+				const isGuessCorrect = this.word.handleGuess(input);
 
-				if(validKeys.includes(input)){
-
-					const isGuessCorrect = this.word.handleGuess(input);
-
-					if (!isGuessCorrect){
-						this.guesses--;
-					}
-
-					this.display.render(this.state);
-					this.checkWin();
+				if (!isGuessCorrect){
+					this.guesses--;
 				}
+
+				this.display.render(this.state);
+				this.checkWin();
 			}
 		},
 		gameOver(condition){
@@ -289,7 +291,7 @@ void (function() {
 				keyDiv.textContent = key.toUpperCase();
 				rowDiv.appendChild(keyDiv);
 
-			})
+			});
 
 		}
 	} 
