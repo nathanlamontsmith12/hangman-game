@@ -24,7 +24,6 @@ class Word {
 		// Note: return false(y) to subtract a life/guess 
 
 		if (this.wasGuessed(guess)) {
-			console.log("You already guessed that letter!");
 			return true;
 		} else {
 			this.guessedLetters.push(guess);
@@ -126,6 +125,14 @@ class Display {
 			}
 		})
 	}
+	updateGuessedLetters(guessedLetters){
+		this.guessedLetters.innerHTML = "";
+		guessedLetters.forEach(ltr => {
+			const newLtr = document.createElement("span");
+			newLtr.textContent = ltr.toUpperCase();
+			this.guessedLetters.appendChild(newLtr);
+		});
+	}
 	render(gameState) {
 		const { word, guesses, round } = gameState;
 		const guessedLetters = word.guessedLetters;
@@ -133,7 +140,8 @@ class Display {
 		this.updateWord(word);
 		this.updateGuesses(guesses);
 		this.updateRound(round);
-		this.updateKeyboard(guessedLetters); 
+		this.updateKeyboard(guessedLetters);
+		this.updateGuessedLetters(guessedLetters); 
 	}
 }
 
@@ -179,21 +187,27 @@ const game = {
 		}
 	},
 	handleInput(input){
-		const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
+		if (input === "enter" && !this.active) {
+			this.init();
+		} else {
+			const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
 
-		if(validKeys.includes(input)){
+			if(validKeys.includes(input)){
 
-			const isGuessCorrect = this.word.handleGuess(input);
+				const isGuessCorrect = this.word.handleGuess(input);
 
-			if (!isGuessCorrect){
-				this.guesses--;
+				if (!isGuessCorrect){
+					this.guesses--;
+				}
+
+				this.display.render(this.state);
+				this.checkWin();
 			}
-
-			this.display.render(this.state);
-			this.checkWin();
 		}
 	},
 	gameOver(condition){
+		this.active = false;
+
 		let message = `The word was ${this.word.solution.toUpperCase()}!`;
 
 		if (condition === "won") {
@@ -214,6 +228,7 @@ const game = {
 		this.word = new Word(randWord);
 	},
 	init(){
+		this.active = true;
 		this.newWord();
 		this.display.newGame();
 		this.display.render(this.state);
@@ -261,7 +276,7 @@ void (function() {
 			allKeys[i].addEventListener("click", (evt)=>{
 				const input = evt.currentTarget.id; 
 				game.handleInput(input);
-			})
+			});
 		}
 	}
 
