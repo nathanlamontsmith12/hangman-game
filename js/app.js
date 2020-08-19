@@ -7,6 +7,21 @@ const wordbank = library.filter(word => word.length >= 6);
 
 console.log("HANGMAN");
 
+
+// +++++++++++++++++++
+// cached elements 
+// +++++++++++++++++++
+
+const display = document.getElementById("display");
+const guesses = document.getElementById("guesses");
+const message = document.getElementById("message");
+const messageDisplay = document.getElementById("message-display");
+const start = document.getElementById("start");
+const gameArea = document.getElementById("game-area")
+const round = document.getElementById("round");
+const guessedLetters = document.getElementById("guessed-letters");
+
+
 // +++++++++++++++++++
 // classes 
 // +++++++++++++++++++
@@ -58,12 +73,21 @@ class Word {
 
 
 // +++++++++++++++++++
-// game logic
+// classes -- singletons
+// +++++++++++++++++++
+
+
+class Display {
+
+}
+
+
+// +++++++++++++++++++
+// game 
 // +++++++++++++++++++
 
 const game = {
 	word: null,
-	firstGame: true,
 	guesses: 5,
 	round: 1,
 	checkWin(){
@@ -82,7 +106,7 @@ const game = {
 				this.guesses--;
 			}
 
-			this.render();
+			this.render(this);
 			this.checkWin();
 		}
 	},
@@ -160,7 +184,41 @@ const game = {
 		const randWord = wordbank.splice(randInd, 1)[0];
 		this.word = new Word(randWord);
 	},
-	makeKeyboard(){
+	init(){
+
+		messageDisplay.style.display = "none";
+		gameArea.style.display = "flex";
+
+		this.getWord();
+		this.render(this);
+	}
+}
+
+
+// +++++++++++++++++++
+// IIFE 
+// +++++++++++++++++++
+
+void (function() {
+
+	// +++++++++++++++++++
+	// event listeners 
+	// +++++++++++++++++++
+
+	start.addEventListener("click", ()=>{
+		game.init();
+	});
+
+	document.body.addEventListener("keypress", (evt) => {
+		const input = evt.key.toLowerCase();
+		game.handleInput(input);
+	});
+
+	// +++++++++++++++++++
+	// keyboard set up 
+	// +++++++++++++++++++
+
+	function makeKeyboard(){
 
 		const firstRow = "qwertyuiop".split("");
 		const secondRow = "asdfghjkl".split("");
@@ -169,7 +227,7 @@ const game = {
 
 		for (let i = 0; i <= 2; i++){
 			const rowDiv = document.getElementById(`r-${i + 1}`);
-
+			
 			rows[i].forEach(key => {
 
 				const keyDiv = document.createElement("div");
@@ -181,55 +239,19 @@ const game = {
 			})
 
 		}
-	},
-	activateKeyboard(){
+	} 
+	
+	function activateKeyboard(){
 		const allKeys = document.querySelectorAll(".key");
 
 		for (let i = 0; i < allKeys.length; i++){
 			allKeys[i].addEventListener("click", (evt)=>{
 				const input = evt.currentTarget.id; 
-				this.handleInput(input);
+				game.handleInput(input);
 			})
 		}
-	},
-	init(){
-
-		messageDisplay.style.display = "none";
-		gameArea.style.display = "flex";
-
-		if (this.firstGame) {
-			document.body.addEventListener("keypress", (evt) => {
-				const input = evt.key.toLowerCase();
-				this.handleInput(input);
-			});			
-
-			this.makeKeyboard();
-			this.activateKeyboard();
-
-			this.firstGame = false;
-		}
-
-		this.getWord();
-		this.render();
 	}
-}
 
-// +++++++++++++++++++
-// cached elements 
-// +++++++++++++++++++
-
-const display = document.getElementById("display");
-const guesses = document.getElementById("guesses");
-const message = document.getElementById("message");
-const messageDisplay = document.getElementById("message-display");
-const start = document.getElementById("start");
-const gameArea = document.getElementById("game-area")
-const round = document.getElementById("round");
-
-// +++++++++++++++++++
-// event listeners 
-// +++++++++++++++++++
-
-start.addEventListener("click", ()=>{
-	game.init();
-});
+	makeKeyboard();
+	activateKeyboard();
+})();
