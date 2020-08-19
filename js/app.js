@@ -1,26 +1,6 @@
-
-const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
-
 // only use words of length >= 6 from word library 
-const wordbank = library.filter(word => word.length >= 6);
 
-
-console.log("HANGMAN");
-
-
-// +++++++++++++++++++
-// cached elements 
-// +++++++++++++++++++
-
-const display = document.getElementById("display");
-const guesses = document.getElementById("guesses");
-const message = document.getElementById("message");
-const messageDisplay = document.getElementById("message-display");
-const start = document.getElementById("start");
-const gameArea = document.getElementById("game-area")
-const round = document.getElementById("round");
-const guessedLetters = document.getElementById("guessed-letters");
-
+const WORD_BANK = library.filter(word => word.length >= 6);
 
 // +++++++++++++++++++
 // classes 
@@ -78,68 +58,44 @@ class Word {
 
 
 class Display {
+	constructor(){
 
-}
+		// +++++++++++++++++++
+		// cached elements
+		// +++++++++++++++++++
 
-
-// +++++++++++++++++++
-// game 
-// +++++++++++++++++++
-
-const game = {
-	word: null,
-	guesses: 5,
-	round: 1,
-	checkWin(){
-		if (this.guesses <= 0){
-			this.gameOver("lost");
-		} else if(this.word.isSolved()){
-			this.gameOver("won");
-		}
-	},
-	handleInput(input){
-		if(validKeys.includes(input)){
-
-			const isGuessCorrect = this.word.handleGuess(input);
-
-			if (!isGuessCorrect){
-				this.guesses--;
-			}
-
-			this.render(this);
-			this.checkWin();
-		}
-	},
-	gameOver(condition){
-
-		gameArea.style.display = "none";
-		messageDisplay.style.display = "flex";
-
-		const newMessage = `The word was ${this.word.solution.toUpperCase()}!`;
-
-		if (condition === "won") {
-			message.textContent = "You won! " + newMessage;
-			this.round++;
-		} else {
-			message.textContent = "You lost! " + newMessage + " Starting back at round 1...";
-			this.round = 1;
-		}
-
-		this.guesses = 5;
-	},
-	// render methods: 
-	displayWord(){
+		this.display = document.getElementById("display");
+		this.guesses = document.getElementById("guesses");
+		this.message = document.getElementById("message");
+		this.messageDisplay = document.getElementById("message-display");
+		this.gameArea = document.getElementById("game-area")
+		this.round = document.getElementById("round");
+		this.guessedLetters = document.getElementById("guessed-letters");
+		this.allKeys = document.querySelectorAll(".key");
+	}
+	gameOver(){
+		this.gameArea.style.display = "none";
+		this.messageDisplay.style.display = "flex";
+	}
+	newGame(){
+		this.messageDisplay.style.display = "none";
+		this.gameArea.style.display = "flex";
+	}
+	updateMessage(message){
+		this.message.textContent = message;
+	}
+	updateWord(word){
 
 		// remove previous wordDiv if it exists 
 		if (document.getElementById("word")){
-			display.removeChild(document.getElementById("word"));
+			this.display.removeChild(document.getElementById("word"));
 		}
 
 		// make new wordDiv: 
 		const wordDiv = document.createElement("div");
 		wordDiv.id = "word";
 
-		this.word.letters.forEach(ltr => {
+		word.letters.forEach(ltr => {
 			
 			let text = "_";
 
@@ -153,44 +109,114 @@ const game = {
 			wordDiv.appendChild(letterDiv);
 		})
 
-		display.appendChild(wordDiv);
-	}, 
-	displayGuesses(){
-		guesses.textContent = `Guesses Remaining: ${this.guesses}`;
-	},
-	displayRound(){
-		round.textContent = `Round: ${this.round}`;
-	},
-	updateKeyboard(){
-		const allKeys = document.querySelectorAll(".key");
-
-		allKeys.forEach(key => {
-			if (this.word.guessedLetters.includes(key.id)) {
+		this.display.appendChild(wordDiv);
+	}
+	updateGuesses(guesses){
+		this.guesses.textContent = `Guesses Remaining: ${guesses}`;
+	}
+	updateRound(round){
+		this.round.textContent = `Round: ${round}`;
+	}
+	updateKeyboard(guessedLetters){
+		this.allKeys.forEach(key => {
+			if (guessedLetters.includes(key.id)) {
 				key.style.opacity = "0.3";
 			} else {
 				key.style.opacity = "1";
 			}
 		})
+	}
+	render(gameState) {
+		const { word, guesses, round } = gameState;
+		const guessedLetters = word.guessedLetters;
+
+		this.updateWord(word);
+		this.updateGuesses(guesses);
+		this.updateRound(round);
+		this.updateKeyboard(guessedLetters); 
+	}
+}
+
+
+// +++++++++++++++++++
+// game 
+// +++++++++++++++++++
+
+const game = {
+	display: null,
+	state: {
+		word: null,
+		guesses: 5,
+		round: 1,
+	}, 
+
+	// getters / setters for game state: 
+	get guesses(){
+		return this.state.guesses;
 	},
-	render(){
-		this.displayWord();
-		this.displayRound();
-		this.displayGuesses();
-		this.updateKeyboard(); 
+	set guesses(num){
+		this.state.guesses = num;
 	},
-	// init methods: 
-	getWord(){
-		const randInd = Math.floor(Math.random() * wordbank.length);
-		const randWord = wordbank.splice(randInd, 1)[0];
+	get word(){
+		return this.state.word;
+	},
+	set word(newWord){
+		this.state.word = newWord;
+	},
+	get round(){
+		return this.state.round;
+	}, 
+	set round(num){
+		this.state.round = num;
+	},
+
+	// game logic: 
+	checkWin(){
+		if (this.guesses <= 0){
+			this.gameOver("lost");
+		} else if(this.word.isSolved()){
+			this.gameOver("won");
+		}
+	},
+	handleInput(input){
+		const validKeys = "qwertyuiopasdfghjklzxcvbnm".split("");
+
+		if(validKeys.includes(input)){
+
+			const isGuessCorrect = this.word.handleGuess(input);
+
+			if (!isGuessCorrect){
+				this.guesses--;
+			}
+
+			this.display.render(this.state);
+			this.checkWin();
+		}
+	},
+	gameOver(condition){
+		let message = `The word was ${this.word.solution.toUpperCase()}!`;
+
+		if (condition === "won") {
+			message = "You won! " + message;
+			this.round++;
+		} else {
+			message = "You lost! " + message + " Starting back at round 1...";
+			this.round = 1;
+		}
+
+		this.display.gameOver();
+		this.display.updateMessage(message);
+		this.guesses = 5;
+	},
+	newWord(){
+		const randInd = Math.floor(Math.random() * WORD_BANK.length);
+		const randWord = WORD_BANK.splice(randInd, 1)[0];
 		this.word = new Word(randWord);
 	},
 	init(){
-
-		messageDisplay.style.display = "none";
-		gameArea.style.display = "flex";
-
-		this.getWord();
-		this.render(this);
+		this.newWord();
+		this.display.newGame();
+		this.display.render(this.state);
 	}
 }
 
@@ -200,19 +226,6 @@ const game = {
 // +++++++++++++++++++
 
 void (function() {
-
-	// +++++++++++++++++++
-	// event listeners 
-	// +++++++++++++++++++
-
-	start.addEventListener("click", ()=>{
-		game.init();
-	});
-
-	document.body.addEventListener("keypress", (evt) => {
-		const input = evt.key.toLowerCase();
-		game.handleInput(input);
-	});
 
 	// +++++++++++++++++++
 	// keyboard set up 
@@ -254,4 +267,28 @@ void (function() {
 
 	makeKeyboard();
 	activateKeyboard();
+
+
+	// +++++++++++++++++++
+	// initialize display singleton
+	// +++++++++++++++++++
+
+	game.display = game.display || new Display();
+
+
+	// +++++++++++++++++++
+	// attach event listeners 
+	// +++++++++++++++++++
+
+	const startBtn = document.getElementById("start");
+
+	startBtn.addEventListener("click", ()=>{
+		game.init();
+	});
+
+	document.body.addEventListener("keypress", (evt) => {
+		const input = evt.key.toLowerCase();
+		game.handleInput(input);
+	});
+
 })();
