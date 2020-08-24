@@ -12,11 +12,10 @@ void (function() {
 	// constants 
 	// +++++++++++++++++++
 
-	const VALID_KEYS = "qwertyuiopasdfghjklzxcvbnm".split("");
+	const VALID_KEYS = "abcdefghijklmnopqrstuvwxyz".split("");
 
 	// only use words of length >= 6 from word library 
 	const WORD_BANK = library.filter(word => word.length >= 6);
-
 
 	// +++++++++++++++++++
 	// classes 
@@ -88,14 +87,11 @@ void (function() {
 		}
 
 
-		// "public" / outward methods -- called by functions in game obj:: 
-		// (key method is render, which must be passed a ref to the game state when invoked)
-		updateMessage(message){
-			this.messageEl.textContent = message;
-		}
+		// "public" / outward method RENDER -- called from within game obj,
+		// and must be passed a ref to the game state when called 
 		render(gameState) {
-			const { word, guesses, round, active } = gameState;
-			const guessedLetters = word.guessedLetters;
+			const { word, guesses, round, active, message } = gameState;
+			const guessedLetters = word ? word.guessedLetters : undefined;
 
 			if (active === true) {
 				this.messageDisplayEl.style.display = "none";
@@ -105,16 +101,18 @@ void (function() {
 				this.messageDisplayEl.style.display = "flex";
 			}
 
-			this.updateWord(word);
-			this.updateGuesses(guesses);
-			this.updateRound(round);
-			this.updateKeyboard(guessedLetters);
-			this.updateGuessedLetters(guessedLetters); 
+			message ? this.updateMessage(message) : null;
+			word ? this.updateWord(word) : null;
+			guesses ? this.updateGuesses(guesses) : null;
+			round ? this.updateRound(round) : null;
+			guessedLetters ? this.updateKeyboard(guessedLetters) && this.updateGuessedLetters(guessedLetters) : null; 
 		}
 
 
 		// "private" / internal methods bundled together and called by render:: 
-
+		updateMessage(message){
+			this.messageEl.textContent = message;
+		}
 		updateWord(word){
 
 			// remove previous wordDiv if it exists 
@@ -183,6 +181,7 @@ void (function() {
 
 		state: {
 			active: false,
+			message: "",
 			word: null,
 			guesses: 5,
 			round: 1,
@@ -190,12 +189,17 @@ void (function() {
 
 
 		// getters / setters for game state: 
-
-		get guesses(){
-			return this.state.guesses;
+		get active(){
+			return this.state.active;
 		},
-		set guesses(num){
-			this.state.guesses = num;
+		set active(bool){
+			this.state.active = bool;
+		},
+		get message(){
+			return this.state.message;
+		},
+		set message(str){
+			this.state.message = str;
 		},
 		get word(){
 			return this.state.word;
@@ -203,28 +207,27 @@ void (function() {
 		set word(newWord){
 			this.state.word = newWord;
 		},
+		get guesses(){
+			return this.state.guesses;
+		},
+		set guesses(num){
+			this.state.guesses = num;
+		},
 		get round(){
 			return this.state.round;
 		}, 
 		set round(num){
 			this.state.round = num;
 		},
-		get active(){
-			return this.state.active;
-		},
-		set active(bool){
-			this.state.active = bool;
-		},
-
 
 		// game logic: 
 
 		checkWin(){
-			if (this.guesses <= 0){
-				this.gameOver("lost");
-			} else if(this.word.isSolved()){
-				this.gameOver("won");
-			}
+			const gameIsOver = this.word.isSolved() || this.guesses <= 0; 
+			if (gameIsOver){
+				const playerHasWon = this.word.isSolved() && this.guesses > 0;
+				this.gameOver(playerHasWon);
+			} 
 		},
 		handleInput(input){
 			if (input === "enter" && !this.active) {
@@ -240,10 +243,10 @@ void (function() {
 				this.checkWin();
 			}
 		},
-		gameOver(condition){
+		gameOver(playerHasWon){
 			let message = `The word was ${this.word.solution.toUpperCase()}!`;
 
-			if (condition === "won") {
+			if (playerHasWon) {
 				message = "You won! " + message;
 				this.round++;
 			} else {
@@ -253,7 +256,7 @@ void (function() {
 
 			this.guesses = 5;
 			this.active = false;
-			this.display.updateMessage(message);
+			this.message = message;
 			this.display.render(this.state);
 		},
 		newWord(){
@@ -261,10 +264,21 @@ void (function() {
 			const randWord = WORD_BANK.splice(randInd, 1)[0];
 			this.word = new Word(randWord);
 		},
+		init(){
+			this.display = this.display || new Display();
+			this.message = "Welcome to Hangman!";
+			this.render();
+		},
 		start(){
 			this.active = true;
 			this.newWord();
-			this.display.render(this.state);
+			this.render();
+		},
+		render(){
+			// delegate render to the display singleton:: 
+			if (this.display) {
+				this.display.render(this.state);
+			}
 		}
 	}
 
@@ -311,13 +325,6 @@ void (function() {
 	activateKeyboard();
 
 
-	// ++++++++++++++++++++++++++++++++
-	// initialize display singleton
-	// ++++++++++++++++++++++++++++++++
-
-	game.display = game.display || new Display();
-
-
 	// +++++++++++++++++++++++++
 	// attach event listeners 
 	// +++++++++++++++++++++++++
@@ -332,5 +339,14 @@ void (function() {
 		const input = evt.key.toLowerCase();
 		game.handleInput(input);
 	});
+
+	// +++++++++++++++++
+	// initialize game
+	// +++++++++++++++++
+
+	game.init();
+
+	// make startBtn visible: 
+	startBtn.style.display = "";
 
 })();
