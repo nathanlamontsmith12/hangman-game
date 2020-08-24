@@ -6,7 +6,8 @@
 </head>
 <body>
 
-	<div id="game-area">
+	<!--  toggle between game-area when game is active, and message-display for start screen // game over -->
+	<section id="game-area">
 		<div id="display">
 			<div id="guesses"></div>
 			<div id="round"></div>
@@ -24,19 +25,24 @@
 			</div>
 			<div id="guessed-letters"></div>
 		</div>
-	</div>
+	</section>
 
-	<div id="message-display">
+	<!-- the section message-display is displayed on page load -->
+	<section id="message-display">
 		<div>
 			<span id="message"></span>
 			<br/>
 			<br/>
 			<br/>
-			<button id="start" style="display: none">Continue</button>
+			<!-- this button's display is turned on after message is set and rendered by javascript -->
+			<button id="start" style="display: none"> Continue </button>
 		</div>
-	</div>
+	</section>
 
+	<!-- IMPORTANT:: load the word-library javascript file FIRST -->
 	<script type="text/javascript" src="js/word-library.js"></script>
+
+	<!-- game logic:: -->
 	<script type="text/javascript" src="js/app.js"></script>
 </body>
 </html>

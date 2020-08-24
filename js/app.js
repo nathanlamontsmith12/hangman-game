@@ -34,7 +34,7 @@ void (function() {
 		}
 		handleGuess(guess){
 
-			// Note: return false(y) to subtract a life/guess 
+			// Note: return false(y) to subtract a guess 
 
 			if (this.wasGuessed(guess)) {
 				return true;
@@ -264,9 +264,13 @@ void (function() {
 			const randWord = WORD_BANK.splice(randInd, 1)[0];
 			this.word = new Word(randWord);
 		},
-		init(){
+		init(startBtn){
 			this.display = this.display || new Display();
 			this.message = "Welcome to Hangman!";
+
+			// turn on display for start btn: 
+			startBtn.style.display = "";
+
 			this.render();
 		},
 		start(){
@@ -340,13 +344,11 @@ void (function() {
 		game.handleInput(input);
 	});
 
+
 	// +++++++++++++++++
 	// initialize game
 	// +++++++++++++++++
 
-	game.init();
-
-	// make startBtn visible: 
-	startBtn.style.display = "";
+	game.init(startBtn);
 
 })();
