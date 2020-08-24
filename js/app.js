@@ -239,7 +239,7 @@ void (function() {
 					this.guesses--;
 				}
 
-				this.display.render(this.state);
+				this.render();
 				this.checkWin();
 			}
 		},
